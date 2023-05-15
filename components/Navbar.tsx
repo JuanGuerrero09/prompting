@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { signIn, signOut, useSession, getProviders } from "next-auth/react";
 
 const Navbar = () => {
-  const isUserLoggedIn = true;
+  const {data: session} = useSession()
 
   const [providers, setProviders] = useState<any>(null);
   const [toggleDropdown, setToggleDropdown] = useState(false);
@@ -15,6 +15,7 @@ const Navbar = () => {
   useEffect(() => {
     (async () => {
       const res = await getProviders();
+      console.log(res)
       setProviders(res);
     })();
   }, []);
@@ -32,7 +33,7 @@ const Navbar = () => {
         <p className="logo_text">Prompting</p>
       </Link>
       <div className="sm:flex hidden">
-        {isUserLoggedIn ? (
+        {session?.user ? (
           <div className="flex gap-3 md:gap-5">
             <Link href="/create-prompt" className="black_btn">
               Create Prompt
@@ -59,21 +60,24 @@ const Navbar = () => {
         ) : (
           <>
             {providers &&
-              Object.values(providers).map((provider) => {
+              Object.values(providers).map((provider: any) => (
                 <button
-                  type="button"
-                  onClick={() => signIn()}
-                  className="black_btn"
+                  type='button'
+                  key={provider.name}
+                  onClick={() => {
+                    signIn(provider.id);
+                  }}
+                  className='black_btn'
                 >
-                  Sign In
-                </button>;
-              })}
+                  Sign in
+                </button>
+              ))}
           </>
         )}
       </div>
       {/*MOBILE NAVIGATION*/}
       <div className="sm:hidden flex relative">
-        {isUserLoggedIn ? (
+        {session?.user ? (
           <div className="flex">
             <Image
               alt="Profile Image"
@@ -114,15 +118,18 @@ const Navbar = () => {
         ) : (
           <>
             {providers &&
-              Object.values(providers).map((provider) => {
+              Object.values(providers).map((provider: any) => (
                 <button
-                  type="button"
-                  onClick={() => signIn()}
-                  className="black_btn"
+                  type='button'
+                  key={provider.name}
+                  onClick={() => {
+                    signIn(provider.id);
+                  }}
+                  className='black_btn'
                 >
-                  Sign In
-                </button>;
-              })}
+                  Sign in
+                </button>
+              ))}
           </>
         )}
       </div>
